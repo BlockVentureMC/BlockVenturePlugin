@@ -3,6 +3,7 @@ package net.blockventuremc.modules.general.events
 import dev.fruxz.stacked.extension.asPlainString
 import dev.fruxz.stacked.text
 import io.papermc.paper.event.player.AsyncChatEvent
+import net.blockventuremc.cache.ChatMessageCache
 import net.blockventuremc.modules.general.events.custom.*
 import net.blockventuremc.modules.placeholders.parsePlaceholders
 import net.kyori.adventure.title.Title
@@ -42,6 +43,13 @@ class ChatEvent : Listener {
         }
         event.viewers().clear()
         event.viewers().addAll(audienceFiltered)
+
+        // Add to chat history
+        event.viewers().forEach { viewer ->
+            if (viewer is Player) {
+                ChatMessageCache.addMessage(viewer.uniqueId, format)
+            }
+        }
 
         event.renderer { _, _, _, _ ->
             return@renderer format
